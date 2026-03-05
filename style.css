@@ -1,0 +1,160 @@
+* {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  table-align: center;
+	text-align: center;
+}
+
+body {
+  color: white;
+  background-color: #143642;
+	overflow-x: hidden;
+	font-size: 14px;
+	margin: 0;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+footer > button {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+table, tr {
+  display: flex;
+  justify-content: center;
+}
+
+h1 {
+  display: inline;
+  font-weight: normal;
+  font-size: 35px;
+}
+
+h2 {
+	display: inline;
+	font-weight: normal;
+  font-size: 25px;
+}
+
+h3 {
+	display: inline;
+	font-weight: normal;
+  font-size: 20px;
+}
+
+.table_center {
+  display: flex;
+  justify-content: center;
+  flex-flow: row wrap;
+}
+
+
+button {
+	color: white;
+  border: solid 0px black;
+  background-color: #1F1300;
+  font-size: 14px;
+	cursor: pointer;
+	user-select: none;
+	margin: 3px;
+}
+
+button:hover {
+	background-color: #1B2021;
+}
+
+.btn {
+	cursor: pointer;
+	max-width: 250px;
+	padding: 7px 25px;
+	text-decoration: none;
+}
+
+.btn_tab {
+	height: 90%;
+	font-size: 20px;
+	padding: 0px 5% 0px 5%;
+}
+
+.btn_tab.choosed {
+	background-color: #1B2021;
+}
+
+.quark {
+	width: 260px;
+	min-height: 125px;
+	background-color: #1F1300;
+	padding: 7px 10px;
+	margin: 5px;
+	user-select: none;
+}
+
+.quark > .quark_name {
+  color: #F7934C;
+	font-size: 25px;
+}
+
+.quark > .quark_btn {
+	width: 100%;
+	height: 30px;
+	font-size: 20px;
+}
+
+.upgrade {
+	background-color: #1F1300;
+	padding: 20px 20px;
+	width: calc(100% - 40px);
+	display: flex;
+  justify-content: center;
+	align-items: center;
+	user-select: none;
+	margin-bottom: 10px;
+}
+
+.upgrade > .desc {
+	width: calc(100% - 150px);
+	text-align: left;
+}
+
+.upgrade > button {
+	height: 40px;
+	font-size: 25px;
+	width: 150px;
+}
+
+.hadrons_container {
+  margin: 20px;
+}
+
+.hadrons_amount {
+  font-size: 50px;
+}
+
+.hadUpg {
+	width: 260px;
+	min-height: 125px;
+	background-color: #1F1300;
+	padding: 7px 10px;
+	margin: 5px;
+	user-select: none;
+}
+
+.hadUpg > .hadUpg_name {
+	font-size: 25px;
+}
+
+.hadUpg > .hadUpg_desc {
+	font-size: 20px;
+}
+
+.hadUpg > .hadUpg_btn {
+	width: 100%;
+	height: 30px;
+	font-size: 15px;
+}

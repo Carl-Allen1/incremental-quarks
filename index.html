@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incremental Quarks</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="js/Element.js"></script>
+    <script src="js/break_eternity.js"></script>
+
+    <script src="js/main.js"></script>
+    <script src="js/saves.js"></script>
+    <script src="js/tabs.js"></script>
+    <script src="js/elements.js"></script>
+    <script src="js/reset.js"></script>
+  </head>
+  <body onload="loadGame()">
+    <div id="app" style="display:none">
+      <div id="tabs_div" style="width: 100%; background-color: #1F1300; height: 75px;"></div>
+      <div style="height: calc(100% - 80px); overflow-y: auto;">
+        <div id="tab_div0">
+          <br><br>
+          <div id="quark_table" class="table_center"></div>
+        </div>
+        <div id="tab_div1">
+          <br><br>
+          <div id="upgs_table"></div>
+        </div>
+        <div id="tab_div2">
+          <br><br>
+          <div class="hadrons_container"><span id="hadrons" class="hadrons_amount">X</span></div>
+          <div id="hadrons_table" class="table_center"></div>
+        </div>
+      </div>
+    </div>
+    <footer><button onclick="hardReset()">Hard Reset (RESETS ALL PROGRESS)</button></footer>
+  </body>
+</html>

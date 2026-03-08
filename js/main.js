@@ -28,40 +28,86 @@ const QUARKS = {
     },
     decays: {
         up() {
-            let a = E(0).add(player.age == "hadron" ? 1 : 0).div(E(2).pow(UPGS.haveHadron(1)))
+            let a = E(0).add(player.age > 0 ? 1 : 0).div(E(2).pow(UPGS.haveHadron(1)))
 
             a = a.sub(player.upgrades.includes(4) ? QUARKS.gains['up']().div(E(2)) : 0)
+
+            a = a.sub(player.leptons['lepton'].div(10));
 
             return a
         },
         down() {
-            let a = E(0).add(player.age == "hadron" ? 1 : 0).div(E(4).pow(UPGS.haveHadron(1)))
+            let a = E(0).add(player.age > 0 ? 1 : 0).div(E(4).pow(UPGS.haveHadron(1)))
+
+            a = a.sub(player.leptons['lepton'].div(10));
 
             return a
         },
         charm() {
-            let a = E(0).add(player.age == "hadron" ? 1 : 0)
+            let a = E(0).add(player.age > 0 ? 1 : 0)
+
+            a = a.sub(player.leptons['lepton'].div(10));
 
             return a
         }
     },
     gains: {
         up() {
-            let a = E(10).mul(E(4).pow(UPGS.haveHadron(0)))
+            let a = E(1).mul(E(4).pow(UPGS.haveHadron(0)))
 
             return a
         },
         down() {
-            let a = E(5).mul(E(2).pow(UPGS.haveHadron(0)))
+            let a = E(0.5).mul(E(2).pow(UPGS.haveHadron(0)))
                 .add(player.upgrades.includes(3) ? player.quarks['up'].div(100) : 0)
 
             return a
         },
         charm() {
-            let a = E(2.5)
+            let a = E(0.25)
                 .add(player.upgrades.includes(5) ? player.quarks['up'].div(1000) : 0)
 
             return a
+        }
+    }
+}
+
+const LEPTONS = {
+    names: ['lepton', 'electron', 'muon', 'tau', 'e_neut', 'm_neut', 't_neut'],
+    capNames: ['Lepton', 'Electron', 'Muon', 'Tau', 'E-Neut', 'M-Neut', 'T-Neut'],
+    gain(source) {
+        let a = this.gains[source] ? this.gains[source]() : E(0)
+
+        return a
+    },
+    can(amount, cost) {
+        return amount.gte(cost)
+    },
+    unls: {
+        lepton() { return true },
+        electron() { return true },
+        muon() { return false },
+        tau() { return false },
+        e_neut() { return false },
+        m_neut() { return false },
+        t_neut() { return false }
+    },
+    gains: {
+        electron() {
+            return E(1).mul(player.leptons['electron'])
+        }
+    },
+    cost: {
+        electron() {
+            return E(1).mul(E(16).pow(player.leptons['electron']))
+        }
+    },
+    buy(x) {
+        let id = this.names[x]
+
+        if(this.can(player.leptons['lepton'], this.cost[id]())) {
+            player.leptons['lepton'] = player.leptons['lepton'].sub(this.cost[id]())
+            player.leptons[id] = player.leptons[id].add(E(1))
         }
     }
 }
@@ -108,13 +154,15 @@ const UPGS = {
 
                     player.upgrades.push(x)
 
+                    if(data.effect) { data.effect() }
+
                     break;
 
                 case "hadronUpgs":
                     player.hadrons = player.hadrons.sub(data.cost())
 
                     if(player.hadronUpgs[x] === undefined) player.hadronUpgs[x] = E(0)
-                    player.hadronUpgs[x] = player.hadronUpgs[x].add(1)
+                    player.hadronUpgs[x] = player.hadronUpgs[x].add(E(1))
 
                     break;
 
@@ -122,9 +170,6 @@ const UPGS = {
 
                     break;
             }
-
-
-            if(data.effect) { data.effect() }
         }
     },
     haveHadron(x) { return player.hadronUpgs[x] !== undefined ? player.hadronUpgs[x] : E(0) },
@@ -137,7 +182,7 @@ const UPGS = {
             cost() { return [E(25)] }
         },
         {
-            unl() { return player.quarks['down'].gte(5) || player.age == "hadron" },
+            unl() { return player.quarks['down'].gte(5) || player.age > 0 },
             name: "How Charismatic",
             desc: "Unlock the Charm Quark",
             res: ['up', 'down'],
@@ -151,18 +196,18 @@ const UPGS = {
             cost() { return [E(100).mul(E(4).pow(player.totalHadrons)), E(25).mul(E(4).pow(player.totalHadrons)),
                 E(10).mul(E(4).pow(player.totalHadrons))] },
             effect() {
-                if(player.age != "hadron") {
+                if(player.age == 0) {
                     setTimeout(() => {
                         alert("Uh oh! The Hadrons have made the environment unstable!")
-                    }, 1000)
+                    }, 500)
                     setTimeout(() => {
                         alert("Quarks will now decay over time!")
                     }, 1000)
                 }
 
-                player.age = "hadron"
+                player.age = 1
 
-                let hadronGain = player.upgrades.includes(6) ? E(1).add(E(Math.floor(Math.log10(player.quarks['up'])))) : 1
+                let hadronGain = player.upgrades.includes(6) ? E(1).add(E(2*Math.floor(Math.log10(player.quarks['up'])))) : 1
 
                 player.hadrons = player.hadrons.add(hadronGain)
                 player.totalHadrons = player.totalHadrons.add(hadronGain)
@@ -172,7 +217,7 @@ const UPGS = {
             }
         },
         {
-            unl() { return player.age == "hadron" },
+            unl() { return player.age > 0 },
             name: "Connected",
             desc: "Up Quarks boost Down Quark gain at a reduced rate",
             res: ['up'],
@@ -198,19 +243,35 @@ const UPGS = {
             desc: "Hadron gain is now increased by Up Quarks at a severely reduced rate",
             res: ['up', 'down', 'charm'],
             cost() { return [E(1500), E(750), E(200)] }
+        },
+        {
+            unl() { return player.totalHadrons.gte(5) && player.age < 2 },
+            name: "Condensing again!",
+            desc: "Condense all progress to gain a Lepton (Forces a Hadron reset)",
+            res: ['up', 'down', 'charm'],
+            cost() { return [E(1e4), E(5e4), E(5000)] },
+            effect() {
+                player.age = 2
+
+                player.leptons['lepton'] = player.leptons['lepton'].add(1)
+
+                player.tab = 3
+
+                forceReset("hadron")
+            }
         }
     ],
     hadronUpgs: [
         {
             id: 0,
-            unl() { return player.age == "hadron" },
+            unl() { return player.age > 0 },
             name: "Proton",
             desc: "Double Down Quark gain and multiply Up Quark Gain by 4",
             cost(x=UPGS.haveHadron(this.id)) { return E(3).pow(x) }
         },
         {
             id: 1,
-            unl() { return player.age == "hadron" },
+            unl() { return player.age > 0 },
             name: "Neutron",
             desc: "Divide Up Quark decay by 2, and Down Quark decay by 4",
             cost(x=UPGS.haveHadron(this.id)) { return E(3).pow(x) }

@@ -9,6 +9,13 @@ function forceReset(type) {
 
             break;
 
+        case "hadron":
+            forceReset("quark")
+
+            player.hadronUpgs = {}
+
+            break;
+
         default:
 
             break;

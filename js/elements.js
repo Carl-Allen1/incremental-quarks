@@ -64,12 +64,26 @@ function setupHTML() {
             <span class="hadUpg_name">${UPGS.hadronUpgs[x].name}: <span id="had_amount${x}">X</span></span><br><br>
             <span class="hadUpg_desc">${UPGS.hadronUpgs[x].desc}</span><br><br>
             <button class="hadUpg_btn" onclick="UPGS.buy('hadronUpgs', ${x})">
-                Cost <span id="hadUpg${x}_cost"></span>
+                Cost: <span id="hadUpg${x}_cost"></span>
             </button>
         </div>`
     }
 
     Element.setHTML("hadrons_table", table)
+
+    table = ""
+
+    for(let x = 1; x < LEPTONS.names.length; x++) {
+        table +=
+        `<div id="${LEPTONS.names[x]}_div" class="lepton">
+            <span class="lepton_name">${LEPTONS.capNames[x]}</span><br><br>
+            <span id="${LEPTONS.names[x]}_amount"></span><br><br>
+            <span id="${LEPTONS.names[x]}_perSec"></span><br><br>
+            <button class="lepton_btn" onclick="LEPTONS.buy(${x})">Buy (Cost: <span id="lepton${x}_cost">X</span>)</button>
+        </div>`
+    }
+
+    Element.setHTML("leptons_table", table)
 
     tmp.el = {}
 	let all = document.getElementsByTagName("*")
@@ -154,6 +168,30 @@ function updateHadUpgradesHTML() {
     }
 }
 
+function updateLeptonsHTML() {
+    if(player.tab != 3) return
+
+    for(let x = 0; x < LEPTONS.names.length; x++) {
+        let id = LEPTONS.names[x]
+
+        tmp.el[id+"_div"].setDisplay(LEPTONS.unls[id]())
+
+        if(LEPTONS.unls[id]()) {
+            tmp.el[id+"_amount"].setHTML(format(player.leptons[id]) + " " + LEPTONS.capNames[x] + "s")
+
+            if(x != LEPTONS.names.length) {
+                tmp.el[id+"_perSec"].setHTML("(" + format(LEPTONS.gain(LEPTONS.names[x + 1])) + " / sec)")
+                tmp.el[id+"_perSec"].changeStyle("color", "#F7B05B")
+            }
+
+            if(id != "lepton") {
+                tmp.el["lepton"+x+"_cost"].changeStyle("color", LEPTONS.can(player.leptons['lepton'], LEPTONS.cost[id]()) ? "chartreuse" : "#db1313")
+                tmp.el["lepton"+x+"_cost"].setTxt(format(LEPTONS.cost[id](), 0))
+            }
+        }
+    }
+}
+
 function updateHTML() {
     tmp.el.app.setDisplay(tmp.ready >= 1)
 
@@ -161,4 +199,5 @@ function updateHTML() {
     updateQuarksHTML()
     updateUpgradesHTML()
     updateHadUpgradesHTML()
+    updateLeptonsHTML()
 }

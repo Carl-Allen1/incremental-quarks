@@ -5,7 +5,8 @@ const TABS = {
     1: [
         {title: "Quarks", unl() { return true }},
         {title: "Upgrades", unl() { return player.quarks['up'].gte(10) || player.upgrades.includes(0)
-            || player.age == "hadron" }},
-        {title: "Hadrons", unl() { return player.age == "hadron" }}
+            || player.age >= 1 }},
+        {title: "Hadrons", unl() { return player.age >= 1 }},
+        {title: "Leptons", unl() { return player.age >= 2 }}
     ]
 }

@@ -3,7 +3,7 @@ class Element {
 		this.id = typeof el == "string" ? el : el.id;
 		this.el = document.getElementById(this.id);
 
-        if(!this.el) {
+        if(!this.el && this.id != "") {
             console.error(`No element found with "${this.id}" id`)
         }
 	}

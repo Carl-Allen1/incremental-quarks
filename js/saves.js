@@ -9,6 +9,15 @@ function calc(dt) {
 
             if(player.quarks[id] < 0) player.quarks[id] = E(0)
         }
+
+        if(player.age >= 2) {
+            for(let x = 0; x < LEPTONS.names.length - 1; x++) {
+                let destId = LEPTONS.names[x]
+                let sourceId = LEPTONS.names[x + 1]
+
+                player.leptons[destId] = player.leptons[destId].add(LEPTONS.gain(sourceId).mul(dt))
+            }
+        }
     }
 
     tmp.ready += dt
@@ -17,15 +26,17 @@ function calc(dt) {
 function getPlayerData() {
     let data = {
         tab: 0,
-        age: "quark",
+        age: 0,
         quarks: {},
         upgrades: [],
         hadrons: E(0),
         totalHadrons: E(0),
-        hadronUpgs: {}
+        hadronUpgs: {},
+        leptons: {}
     }
 
     for(let x = 0; x < QUARKS.names.length; x++) { data.quarks[QUARKS.names[x]] = E(0) }
+    for(let x = 0; x < LEPTONS.names.length; x++) { data.leptons[LEPTONS.names[x]] = E(0) }
 
     return data
 }
@@ -51,6 +62,10 @@ function loadPlayer(load) {
 function convertStringToDecimal() {
     for(let x = 0; x < QUARKS.names.length; x++) {
         player.quarks[QUARKS.names[x]] = E(player.quarks[QUARKS.names[x]])
+    }
+
+    for(let x = 0; x < LEPTONS.names.length; x++) {
+        player.leptons[LEPTONS.names[x]] = E(player.leptons[LEPTONS.names[x]])
     }
 
     player.hadrons = E(player.hadrons)

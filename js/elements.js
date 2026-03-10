@@ -1,10 +1,19 @@
 const QUARK_COLORS = {
-    'up': '#D00',
-    'down': '#00D',
-    'charm': '#0D0',
-    'strange': '#0DD',
-    'top': '#DD0',
-    'bottom': '#D0D'
+    'up': '#E00',
+    'down': '#00E',
+    'charm': '#0E0',
+    'strange': '#0EE',
+    'top': '#EE0',
+    'bottom': '#E0E'
+}
+
+const QUARK_NAMES = {
+    'up': 'Up',
+    'down': 'Down',
+    'charm': 'Charm',
+    'strange': 'Strange',
+    'top': 'Top',
+    'bottom': 'Bottom'
 }
 
 function setupHTML() {
@@ -38,7 +47,7 @@ function setupHTML() {
         let txt = []
 
         for(let i = 0; i < res.length; i++) {
-            txt.push(`<span id="upg${x}cost${i}">X</span><span class="quark_name"> ${QUARKS.capNames[i]}</span>`)
+            txt.push(`<span id="upg${x}cost${i}">X</span><span class="quark_name"> ${QUARK_NAMES[res[i]]}</span>`)
         }
 
         table +=
@@ -137,7 +146,7 @@ function updateUpgradesHTML() {
             for(let i = 0; i < res.length; i++) {
                 tmp.el["upg"+x+"cost"+i].changeStyle("color", UPGS.canResource(res[i], data.cost()[i]) ? "chartreuse" : "#db1313")
 
-                tmp.el["upg"+x+"cost"+i].setTxt(format(data.cost()[i]))
+                tmp.el["upg"+x+"cost"+i].setTxt(format(data.cost()[i], 1))
             }
         }
 

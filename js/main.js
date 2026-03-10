@@ -22,31 +22,36 @@ const QUARKS = {
         up() { return true },
         down() { return player.upgrades.includes(0) },
         charm() { return player.upgrades.includes(1) },
-        strange() { return false },
+        strange() { return player.upgrades.includes(8) },
         top() { return false },
         bottom() { return false }
     },
     decays: {
         up() {
             let a = E(0).add(player.age > 0 ? 1 : 0).div(E(2).pow(UPGS.haveHadron(1)))
-
-            a = a.sub(player.upgrades.includes(4) ? QUARKS.gains['up']().div(E(2)) : 0)
-
-            a = a.sub(player.leptons['lepton'].div(10));
+                .sub(player.upgrades.includes(4) ? QUARKS.gains['up']().div(E(2)) : 0)
+                .sub(player.leptons['lepton'].div(10))
 
             return a
         },
         down() {
             let a = E(0).add(player.age > 0 ? 1 : 0).div(E(4).pow(UPGS.haveHadron(1)))
-
-            a = a.sub(player.leptons['lepton'].div(10));
+                .sub(player.leptons['lepton'].div(10))
+                .sub(player.upgrades.includes(9) ? player.quarks['up'].div(100) : 0)
 
             return a
         },
         charm() {
             let a = E(0).add(player.age > 0 ? 1 : 0)
+                .sub(player.leptons['lepton'].div(10))
+                .sub(player.upgrades.includes(9) ? player.quarks['up'].div(1000) : 0)
 
-            a = a.sub(player.leptons['lepton'].div(10));
+            return a
+        },
+        strange() {
+            let a = E(0).add(player.age > 0 ? 1 : 0)
+                .sub(player.leptons['lepton'].div(1000))
+                .sub(player.upgrades.includes(9) ? player.quarks['up'].div(1000) : 0)
 
             return a
         }
@@ -68,6 +73,12 @@ const QUARKS = {
                 .add(player.upgrades.includes(5) ? player.quarks['up'].div(1000) : 0)
 
             return a
+        },
+        strange() {
+            let a = E(0.1)
+                .add(player.upgrades.includes(9) ? player.quarks['up'].div(1000) : 0)
+
+            return a
         }
     }
 }
@@ -86,7 +97,7 @@ const LEPTONS = {
     unls: {
         lepton() { return true },
         electron() { return true },
-        muon() { return false },
+        muon() { return player.age >= 3 },
         tau() { return false },
         e_neut() { return false },
         m_neut() { return false },
@@ -95,11 +106,17 @@ const LEPTONS = {
     gains: {
         electron() {
             return E(1).mul(player.leptons['electron'])
+        },
+        muon() {
+            return E(1).mul(player.leptons['muon'])
         }
     },
     cost: {
         electron() {
             return E(1).mul(E(16).pow(player.leptons['electron']))
+        },
+        muon() {
+            return E(1).mul(E(256).pow(player.leptons['muon']))
         }
     },
     buy(x) {
@@ -174,21 +191,21 @@ const UPGS = {
     },
     haveHadron(x) { return player.hadronUpgs[x] !== undefined ? player.hadronUpgs[x] : E(0) },
     upgs: [
-        {
+        { // 0
             unl() { return true },
             name: "Inverting",
             desc: "Unlock the Down Quark",
             res: ['up'],
             cost() { return [E(25)] }
         },
-        {
+        { // 1
             unl() { return player.quarks['down'].gte(5) || player.age > 0 },
             name: "How Charismatic",
             desc: "Unlock the Charm Quark",
             res: ['up', 'down'],
             cost() { return [E(50), E(10)] }
         },
-        {
+        { // 2
             unl() { return player.upgrades.includes(1) },
             name: "Condensed?",
             desc: "Condense all progress to gain Hadrons (Forces a Quark reset)",
@@ -205,9 +222,12 @@ const UPGS = {
                     }, 1000)
                 }
 
-                player.age = 1
+                if(player.age == 0) {
+                    player.age = 1
+                }
 
-                let hadronGain = player.upgrades.includes(6) ? E(1).add(E(2*Math.floor(Math.log10(player.quarks['up'])))) : 1
+                let hadronGain = player.upgrades.includes(6) ? E(1)
+                    .add(E(2).mul(E(Math.floor(Math.log10(player.quarks['up']))))) : 1
 
                 player.hadrons = player.hadrons.add(hadronGain)
                 player.totalHadrons = player.totalHadrons.add(hadronGain)
@@ -216,38 +236,38 @@ const UPGS = {
                 forceReset("quark")
             }
         },
-        {
-            unl() { return player.age > 0 },
+        { // 3
+            unl() { return player.age > 0 && player.upgrades.includes(1) },
             name: "Connected",
             desc: "Up Quarks boost Down Quark gain at a reduced rate",
             res: ['up'],
             cost() { return [E(200)] }
         },
-        {
+        { // 4
             unl() { return player.upgrades.includes(3) },
             name: "Passive Income",
             desc: "You now gain Up Quarks passively at a reduced rate",
             res: ['up', 'down'],
             cost() { return [E(300), E(150)] }
         },
-        {
+        { // 5
             unl() { return player.upgrades.includes(4) },
             name: "Incredibly Eloquent",
             desc: "Upgrade 4 now also affects Charm Quarks",
             res: ['up'],
             cost() { return [E(1000)] }
         },
-        {
-            unl() { return player.totalHadrons.gte(2) },
+        { // 6
+            unl() { return player.totalHadrons.gte(2) && player.upgrades.includes(5) },
             name: "More Hadrons!",
             desc: "Hadron gain is now increased by Up Quarks at a severely reduced rate",
             res: ['up', 'down', 'charm'],
             cost() { return [E(1500), E(750), E(200)] }
         },
-        {
-            unl() { return player.totalHadrons.gte(5) && player.age < 2 },
+        { // 7
+            unl() { return player.totalHadrons.gte(5) && player.age < 2  && player.upgrades.includes(5) },
             name: "Condensing again!",
-            desc: "Condense all progress to gain a Lepton (Forces a Hadron reset)",
+            desc: "Condense all progress to gain a Lepton (Forces a Quark reset)",
             res: ['up', 'down', 'charm'],
             cost() { return [E(1e4), E(5e4), E(5000)] },
             effect() {
@@ -257,7 +277,35 @@ const UPGS = {
 
                 player.tab = 3
 
-                forceReset("hadron")
+                forceReset("quark")
+            }
+        },
+        { // 8
+            unl() { return player.age >= 2 && player.upgrades.includes(5) },
+            name: "How Strange...",
+            desc: "Unlock the Strange Quark",
+            res: ['charm'],
+            cost() { return [E(1e4)] }
+        },
+        { // 9
+            unl() { return player.upgrades.includes(8) },
+            name: "Very Odd",
+            desc: "Upgrade 4 now affects Strange Quark gain, and works passively",
+            res: ['charm', 'strange'],
+            cost() { return [E(1e5), E(1000)] }
+        },
+        { // 10
+            unl() { return player.upgrades.includes(9) && player.age < 3 },
+            name: "Muon' On",
+            desc: "Unlock another Lepton (Forces a Quark reset)",
+            res: ['down', 'charm', 'strange'],
+            cost() { return [E(1e6), E(5e5), E(5e4)] },
+            effect() {
+                player.age = 3
+
+                player.tab = 3
+
+                forceReset("quark")
             }
         }
     ],
